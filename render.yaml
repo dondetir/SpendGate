@@ -1,0 +1,15 @@
+# Deploy target: a PERSISTENT Node web service (not serverless), so the
+# session-keyed in-process store keeps durable shared state across the agent's
+# tool calls. Render is a challenge sponsor.
+services:
+  - type: web
+    name: spendgate
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: SESSION_SECRET
+        generateValue: true # real HMAC secret in prod; code falls back to a dev secret locally
+      - key: NODE_VERSION
+        value: "22"
