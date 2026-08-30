@@ -15,12 +15,18 @@ export interface Session {
   role: Role;
   board: Expense[];
   decisions: Record<string, TriageResult>; // by expense id, set by triage
+  managerApproved: Set<string>; // ids a manager cleared; preserved across re-triage
 }
 
 const sessions = new Map<string, Session>();
+const MAX_SESSIONS = 500; // bound process memory; evict oldest (insertion order)
 
 export function createSession(id: string, role: Role = "analyst"): Session {
-  const s: Session = { id, role, board: seedBoard(), decisions: {} };
+  if (sessions.size >= MAX_SESSIONS) {
+    const oldest = sessions.keys().next().value;
+    if (oldest !== undefined) sessions.delete(oldest);
+  }
+  const s: Session = { id, role, board: seedBoard(), decisions: {}, managerApproved: new Set() };
   sessions.set(id, s);
   return s;
 }

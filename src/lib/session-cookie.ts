@@ -7,7 +7,9 @@ import { createSession, getSession, type Session } from "./store";
 // signature check and gets a fresh analyst session.
 
 const COOKIE = "sg_sid";
-const SECRET = process.env.SESSION_SECRET ?? "dev-secret-change-me";
+const DEV_SECRET = "dev-secret-change-me";
+const SECRET = process.env.SESSION_SECRET ?? DEV_SECRET;
+const IS_PROD = process.env.NODE_ENV === "production";
 
 function sign(id: string): string {
   const mac = crypto.createHmac("sha256", SECRET).update(id).digest("base64url");
@@ -28,12 +30,22 @@ function verify(value: string | undefined): string | null {
 }
 
 export async function getOrCreateSession(): Promise<Session> {
+  // Fail closed at request time (not build time) if prod is running the dev secret.
+  if (IS_PROD && SECRET === DEV_SECRET) {
+    throw new Error("SESSION_SECRET must be set in production (refusing the dev fallback).");
+  }
   const store = await cookies();
   const id = verify(store.get(COOKIE)?.value);
   if (id) {
     return getSession(id) ?? createSession(id);
   }
   const newId = crypto.randomUUID();
-  store.set(COOKIE, sign(newId), { httpOnly: true, sameSite: "lax", path: "/" });
+  store.set(COOKIE, sign(newId), {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    secure: IS_PROD,
+    maxAge: 60 * 60 * 8, // 8h
+  });
   return createSession(newId);
 }

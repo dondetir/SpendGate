@@ -1,6 +1,8 @@
 import { DEFAULT_POLICY, type Expense } from "./policy/types";
-import { triageBatch, type TriageResult } from "./policy/engine";
+import { triageBatch, detectUntrustedContent, type TriageResult } from "./policy/engine";
 import type { Session } from "./store";
+
+const APPROVED_DECISION: TriageResult["decision"] = { status: "approved", reasons: ["within_policy"], requiresApproval: false };
 
 // Server-side operations. Every mutation authorizes against session.role, which
 // is stored server-side — never trusts a client-supplied role.
@@ -62,7 +64,11 @@ export function listBoard(session: Session): { role: Session["role"]; items: Boa
 // The single WebMCP `triage_batch` call runs this. The SERVER decides everything
 // from structured fields; the agent decides nothing. Returns no memo text.
 export function runTriage(session: Session): TriageResultView[] {
-  const results = triageBatch(session.board, { role: session.role, policy: DEFAULT_POLICY });
+  const raw = triageBatch(session.board, { role: session.role, policy: DEFAULT_POLICY });
+  // Preserve a manager's prior approval across a re-triage instead of erasing it.
+  const results = raw.map((r) =>
+    session.managerApproved.has(r.expenseId) ? { ...r, decision: APPROVED_DECISION } : r,
+  );
   session.decisions = Object.fromEntries(results.map((r) => [r.expenseId, r]));
   return results.map((r) => ({
     expenseId: r.expenseId,
@@ -78,8 +84,9 @@ export function runTriage(session: Session): TriageResultView[] {
 export function readExpense(session: Session, id: string): (Expense & { untrusted: boolean }) | null {
   const e = session.board.find((x) => x.id === id);
   if (!e) return null;
-  const r = session.decisions[id];
-  return { ...e, untrusted: r ? r.untrusted : false };
+  // Compute the untrusted signal directly from the memo, independent of whether
+  // triage has run — the safety hint must not depend on prior state.
+  return { ...e, untrusted: detectUntrustedContent(e.memo) };
 }
 
 // approve_expense: privileged, MANAGER ONLY, enforced server-side. Clears a
@@ -92,10 +99,12 @@ export function approveExpense(session: Session, id: string): BoardItemView {
   const e = session.board.find((x) => x.id === id);
   if (!e) throw new Error(`Expense ${id} not found`);
   const prior = session.decisions[id];
-  session.decisions[id] = {
-    expenseId: id,
-    decision: { status: "approved", reasons: ["within_policy"], requiresApproval: false },
-    untrusted: prior ? prior.untrusted : false,
-  };
+  // Only a flagged item that actually needs approval can be approved — not a
+  // pending, already-approved, or rejected one.
+  if (!prior || !prior.decision.requiresApproval) {
+    throw new AuthzError("Only a flagged expense awaiting approval can be approved.");
+  }
+  session.managerApproved.add(id);
+  session.decisions[id] = { expenseId: id, decision: APPROVED_DECISION, untrusted: prior.untrusted };
   return toView(e, session);
 }

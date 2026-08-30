@@ -70,4 +70,27 @@ describe("approve_expense is manager-only, enforced server-side", () => {
     expect(view.status).toBe("approved");
     expect(view.requiresApproval).toBe(false);
   });
+
+  it("refuses to approve an item that is not flagged for approval", () => {
+    setRole(s.id, "manager");
+    runTriage(s);
+    // exp-01 is a compliant, auto-approved filler item — not awaiting approval
+    expect(() => approveExpense(s, "exp-01")).toThrow(AuthzError);
+  });
+
+  it("preserves a manager approval across a re-triage", () => {
+    setRole(s.id, "manager");
+    runTriage(s);
+    approveExpense(s, "exp-travel-big");
+    runTriage(s); // re-run must not erase the override
+    const item = listBoard(s).items.find((i) => i.id === "exp-travel-big")!;
+    expect(item.status).toBe("approved");
+  });
+});
+
+describe("read_expense untrusted flag is independent of triage", () => {
+  it("marks the poisoned memo untrusted even before any triage", () => {
+    const e = readExpense(s, "exp-poison")!;
+    expect(e.untrusted).toBe(true);
+  });
 });

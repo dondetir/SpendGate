@@ -3,7 +3,8 @@ import { approveExpense, AuthzError } from "@/lib/service";
 
 export async function POST(request: Request) {
   const session = await getOrCreateSession();
-  const { id } = (await request.json().catch(() => ({}))) as { id?: string };
+  const body = (await request.json().catch(() => null)) as unknown;
+  const id = body && typeof body === "object" ? (body as { id?: string }).id : undefined;
   if (!id) return Response.json({ error: "id required" }, { status: 400 });
   try {
     const view = approveExpense(session, id);
