@@ -79,11 +79,12 @@ describe("evaluate — hard rejects", () => {
   });
 
   it("rejects a disallowed category", () => {
-    const policy = { ...DEFAULT_POLICY, allowedCategories: ["travel"] as const };
-    const d = evaluate(expense({ category: "meals", amount: 20 }), { role: "manager", policy: { ...DEFAULT_POLICY, allowedCategories: ["travel"] } });
+    const d = evaluate(expense({ category: "meals", amount: 20 }), {
+      role: "manager",
+      policy: { ...DEFAULT_POLICY, allowedCategories: ["travel"] },
+    });
     expect(d.status).toBe("rejected");
     expect(d.reasons).toContain("disallowed_category");
-    void policy;
   });
 });
 
@@ -96,6 +97,16 @@ describe("INJECTION CONTAINMENT — the security property", () => {
     const attacked = evaluate(expense({ category: "meals", amount: 300, memo: poison }), analyst);
     expect(attacked).toEqual(benign); // memo is never read by the engine
     expect(attacked.status).toBe("flagged"); // still capped, not approved
+  });
+
+  it("evaluate never reads memo (structural guarantee — throws if it does)", () => {
+    const trap = expense({ category: "meals", amount: 300 });
+    Object.defineProperty(trap, "memo", {
+      get() {
+        throw new Error("evaluate read expense.memo");
+      },
+    });
+    expect(() => evaluate(trap, analyst)).not.toThrow();
   });
 
   it("a malicious memo cannot approve an over-limit expense", () => {
