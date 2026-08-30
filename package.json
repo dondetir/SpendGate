@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "VITE_CONFIG_NATIVE_IGNORE_WARNING=true vitest run",
-    "test:watch": "VITE_CONFIG_NATIVE_IGNORE_WARNING=true vitest"
+    "test:watch": "VITE_CONFIG_NATIVE_IGNORE_WARNING=true vitest",
+    "verify:ui": "node scripts/screenshots.mjs"
   },
   "dependencies": {
     "motion": "^13.1.1",
@@ -24,6 +25,7 @@
     "@vitest/coverage-v8": "^4.1.11",
     "eslint": "^9",
     "eslint-config-next": "16.3.3",
+    "playwright": "^1.62.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.11"
