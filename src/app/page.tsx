@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LayoutGroup, motion } from "motion/react";
-import { registerSpendGateTools, CHANGED_EVENT } from "@/lib/webmcp-tools";
+import { registerSpendGateTools, setManagerTools, CHANGED_EVENT } from "@/lib/webmcp-tools";
 
 type Status = "pending" | "approved" | "flagged" | "rejected";
 interface BoardItem {
@@ -152,7 +152,8 @@ export default function Home() {
   const switchRole = async (next: "analyst" | "manager") => {
     if (role === next) return;
     await fetch("/api/login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ role: next }) });
-    await registerSpendGateTools(next).then((r) => setWebmcp({ supported: r.supported, n: r.registered.length }));
+    const r = await setManagerTools(next === "manager"); // only touch the manager delta
+    if (r.supported) setWebmcp({ supported: true, n: r.registered.length });
     await refresh();
   };
 

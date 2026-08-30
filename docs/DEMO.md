@@ -18,9 +18,10 @@ Record in the ChatGPT desktop app's in-app browser on a **GPT-5.6 (Sol/Terra)** 
 
 ## 2:00–2:40 — Role-scoped capability
 - Ask the agent (still analyst): **"Approve the $4,200 travel expense."** → it can't: no `approve_expense` tool for an analyst; the server would 403 anyway.
-- Click **Manager**. The chip updates to 4 tools incl. `approve_expense`.
-- Ask: **"Now approve the $4,200 travel expense."** → confirmation gate → card moves to **Approved**.
+- Click **Manager**. The chip updates to 4 tools; `approve_expense` is registered (only the manager delta is added — base tools are untouched).
+- Approve the $4,200 travel expense. If the agent picks up the new tool mid-conversation, ask it; otherwise click the card's **Approve** button (guaranteed). Either way it moves to **Approved**.
 - VO: "The tool surface is a function of your role, enforced on the server. Managers get a money-moving action — and it's a consequential action, so the browser asks before it runs."
+- Note: whether an agent sees a newly-registered tool mid-conversation is undocumented in the ChatGPT browser, so the button is the reliable path on camera.
 
 ## 2:40–3:00 — Close
 - VO: "SpendGate: an agent that runs your back office, with the governance that lets you actually turn it on — role-scoped tools, server-authorized money, and prompt-injection contained. One WebMCP origin, done right."

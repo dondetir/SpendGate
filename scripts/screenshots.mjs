@@ -16,7 +16,11 @@ try {
   await p.screenshot({ path: `${OUT}/sg-1-pending.png` });
 
   await p.getByText("Run triage", { exact: false }).click();
-  await p.waitForTimeout(8500); // let the ~40-card drip finish
+  await p.waitForTimeout(1200); // mid-flight: cards should be between columns, not teleporting
+  await p.screenshot({ path: `${OUT}/sg-2a-midflight.png` });
+  await p.waitForTimeout(1300);
+  await p.screenshot({ path: `${OUT}/sg-2b-midflight.png` });
+  await p.waitForTimeout(6000); // let the ~40-card drip finish
   await p.screenshot({ path: `${OUT}/sg-2-triaged.png`, fullPage: true });
 
   const reveal = p.getByText("Show the blocked memo");

@@ -106,3 +106,22 @@ export async function registerSpendGateTools(role: Role): Promise<RegisterResult
   const names = ctx.getTools ? (await ctx.getTools()).map((t) => t.name) : tools.map((t) => t.name);
   return { supported: true, registered: names };
 }
+
+// Role switch: change ONLY the manager delta. Never re-registers base tools
+// (a duplicate registerTool on the same name is undefined behavior), and guards
+// against double-registering approve_expense.
+export async function setManagerTools(enabled: boolean): Promise<RegisterResult> {
+  const ctx = typeof document !== "undefined" ? document.modelContext : undefined;
+  if (!ctx || typeof ctx.registerTool !== "function") {
+    return { supported: false, registered: [] };
+  }
+  const present = ctx.getTools ? (await ctx.getTools()).map((t) => t.name) : [];
+  const has = present.includes("approve_expense");
+  if (enabled && !has) {
+    for (const tool of managerTools()) await ctx.registerTool(tool);
+  } else if (!enabled && has && typeof ctx.unregisterTool === "function") {
+    await ctx.unregisterTool("approve_expense");
+  }
+  const names = ctx.getTools ? (await ctx.getTools()).map((t) => t.name) : present;
+  return { supported: true, registered: names };
+}
