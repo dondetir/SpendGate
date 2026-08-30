@@ -48,7 +48,9 @@ Open `/` for the console, `/probe` for a WebMCP registration check.
 
 ## Test it as an agent
 
-WebMCP site tools require a **recent ChatGPT desktop app on a GPT-5.6 (Sol/Terra) account** — they are disabled on other models and unavailable in Enterprise/Edu workspaces. Point the ChatGPT browser at the deployed URL, or in Chrome 146+ enable `chrome://flags/#enable-webmcp-testing`. If the API isn't present the console still works via its buttons (`Run triage`, `Approve`), and the `WebMCP not detected` chip tells you.
+WebMCP site tools require a **recent ChatGPT desktop app on a GPT-5.6 (Sol/Terra) account** — they are disabled on other models and unavailable in Enterprise/Edu workspaces.
+
+You can also verify tool registration in **plain Google Chrome** (confirmed on Chrome 152): launch it with `--enable-features=WebMCP` (or enable `chrome://flags/#enable-webmcp-testing`), open the app, and the header shows **"WebMCP · N tools live"**. `getTools()` in the console returns `list_expenses, read_expense, triage_batch` (as analyst) and adds `approve_expense` after switching to Manager. The `/probe` page reports the same. If the API isn't present the console still works via its buttons (`Run triage`, `Approve`) and the `WebMCP not detected` chip tells you.
 
 ## Deploy
 
