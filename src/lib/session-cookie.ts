@@ -8,7 +8,9 @@ import { createSession, getSession, type Session } from "./store";
 
 const COOKIE = "sg_sid";
 const DEV_SECRET = "dev-secret-change-me";
-const SECRET = process.env.SESSION_SECRET ?? DEV_SECRET;
+// `||` (not `??`) so an empty SESSION_SECRET="" also falls back to DEV_SECRET,
+// which the prod check below then refuses — an empty secret must not sign cookies.
+const SECRET = process.env.SESSION_SECRET || DEV_SECRET;
 const IS_PROD = process.env.NODE_ENV === "production";
 
 function sign(id: string): string {

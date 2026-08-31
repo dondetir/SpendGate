@@ -60,6 +60,20 @@ function baseTools(): ModelContextTool[] {
         return r.data;
       },
     },
+    {
+      name: "request_approval",
+      title: "Ask whether a flagged expense can be cleared (and by whom)",
+      description:
+        "Probe authority for a flagged expense WITHOUT changing anything. Returns a structured verdict: { ok, reason_code, human_reason, required_role?, escalation?, next_action? }. If you are not authorized, reason_code is 'role_limit_exceeded' and 'escalation' tells you the next step (route to a manager) — act on it rather than retrying. If authorized, next_action points at approve_expense. Use this before attempting a money action.",
+      inputSchema: {
+        type: "object",
+        properties: { id: { type: "string", description: "Expense id to check, e.g. exp-travel-big" } },
+        required: ["id"],
+        additionalProperties: false,
+      },
+      annotations: { readOnlyHint: true }, // never mutates: pure authority probe
+      execute: async (input) => (await api("/api/request-approval", { id: String(input.id ?? "") })).data,
+    },
   ];
 }
 
@@ -69,7 +83,7 @@ function managerTools(): ModelContextTool[] {
       name: "approve_expense",
       title: "Approve a flagged expense (manager only)",
       description:
-        "Approve a single flagged or over-limit expense. This is a consequential, money-moving action restricted to managers and authorized server-side.",
+        "Approve a single flagged or over-limit expense. This is a consequential, money-moving action restricted to managers and authorized server-side. If denied, it returns a structured refusal { ok:false, reason_code, human_reason, required_role?, escalation? } — act on 'escalation' to self-correct rather than retrying the same call.",
       inputSchema: {
         type: "object",
         properties: { id: { type: "string", description: "Expense id to approve" } },
@@ -80,7 +94,7 @@ function managerTools(): ModelContextTool[] {
       execute: async (input) => {
         const r = await api("/api/approve", { id: String(input.id ?? "") });
         announce();
-        if (!r.ok) return { error: r.data?.error ?? "approval failed", status: r.status };
+        // Return the structured refusal verbatim so the agent can self-correct.
         return r.data;
       },
     },
@@ -119,8 +133,17 @@ export async function setManagerTools(enabled: boolean): Promise<RegisterResult>
   const has = present.includes("approve_expense");
   if (enabled && !has) {
     for (const tool of managerTools()) await ctx.registerTool(tool);
-  } else if (!enabled && has && typeof ctx.unregisterTool === "function") {
-    await ctx.unregisterTool("approve_expense");
+  } else if (!enabled && has) {
+    if (typeof ctx.unregisterTool === "function") {
+      await ctx.unregisterTool("approve_expense");
+    } else if (typeof window !== "undefined") {
+      // No unregisterTool in this browser (e.g. Chrome 152 exposes only
+      // registerTool/getTools/executeTool). Reload so the page re-registers the
+      // analyst-only surface cleanly — otherwise approve_expense would linger and
+      // the chip would misreport the tool count for a downgraded role.
+      window.location.reload();
+      return { supported: true, registered: present.filter((n) => n !== "approve_expense") };
+    }
   }
   const names = ctx.getTools ? (await ctx.getTools()).map((t) => t.name) : present;
   return { supported: true, registered: names };

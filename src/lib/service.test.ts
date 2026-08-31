@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createSession, setRole, type Session } from "./store";
-import { listBoard, runTriage, readExpense, approveExpense, AuthzError } from "./service";
+import { listBoard, runTriage, readExpense, approveExpense, requestApproval, AuthzError } from "./service";
 
 let s: Session;
 beforeEach(() => {
@@ -85,6 +85,52 @@ describe("approve_expense is manager-only, enforced server-side", () => {
     runTriage(s); // re-run must not erase the override
     const item = listBoard(s).items.find((i) => i.id === "exp-travel-big")!;
     expect(item.status).toBe("approved");
+  });
+});
+
+describe("refusals are machine-actionable", () => {
+  it("approve_expense denial for an analyst carries a reason_code and an escalation", () => {
+    runTriage(s);
+    try {
+      approveExpense(s, "exp-travel-big");
+      throw new Error("should have thrown");
+    } catch (err) {
+      expect(err).toBeInstanceOf(AuthzError);
+      const e = err as AuthzError;
+      expect(e.reason_code).toBe("role_limit_exceeded");
+      expect(e.required_role).toBe("manager");
+      expect(e.escalation?.action).toBe("escalate_to_manager");
+    }
+  });
+
+  it("request_approval refuses an analyst with a structured escalation and never mutates", () => {
+    runTriage(s);
+    const v = requestApproval(s, "exp-travel-big");
+    expect(v.ok).toBe(false);
+    expect(v.reason_code).toBe("role_limit_exceeded");
+    expect(v.required_role).toBe("manager");
+    expect(v.escalation?.action).toBe("escalate_to_manager");
+    // still flagged and awaiting approval — the probe changed nothing
+    const item = listBoard(s).items.find((i) => i.id === "exp-travel-big")!;
+    expect(item.status).toBe("flagged");
+    expect(item.requiresApproval).toBe(true);
+  });
+
+  it("request_approval authorizes a manager and points at approve_expense", () => {
+    setRole(s.id, "manager");
+    runTriage(s);
+    const v = requestApproval(s, "exp-travel-big");
+    expect(v.ok).toBe(true);
+    expect(v.reason_code).toBe("authorized");
+    expect(v.next_action).toEqual({ tool: "approve_expense", id: "exp-travel-big" });
+  });
+
+  it("request_approval reports not_awaiting_approval for a compliant item", () => {
+    setRole(s.id, "manager");
+    runTriage(s);
+    const v = requestApproval(s, "exp-01");
+    expect(v.ok).toBe(false);
+    expect(v.reason_code).toBe("not_awaiting_approval");
   });
 });
 

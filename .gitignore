@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# demo video output (large binaries; upload to YouTube/Drive for submission)
+/output
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

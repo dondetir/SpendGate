@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SpendGate — agent-operable expense approvals",
+  title: "SpendGate — Agents move the work. Policy makes the call.",
   description:
-    "A WebMCP console where a ChatGPT agent triages an expense-approval queue against policy, with server-side governance and prompt-injection containment.",
+    "Policy-based expense approvals with role-aware controls and protected memo review.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -11,9 +11,21 @@ export async function POST(request: Request) {
     return Response.json({ ok: true, expense: view });
   } catch (err) {
     if (err instanceof AuthzError) {
-      return Response.json({ error: err.message }, { status: 403 });
+      // Machine-actionable refusal: reason_code + how to self-correct.
+      return Response.json(
+        {
+          ok: false,
+          error: err.message,
+          reason_code: err.reason_code,
+          human_reason: err.message,
+          required_role: err.required_role,
+          escalation: err.escalation,
+          expenseId: err.expenseId,
+        },
+        { status: err.status },
+      );
     }
     const message = err instanceof Error ? err.message : "error";
-    return Response.json({ error: message }, { status: 400 });
+    return Response.json({ ok: false, error: message }, { status: 400 });
   }
 }
