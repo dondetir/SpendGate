@@ -77,7 +77,7 @@ export default function ProbePage() {
       </pre>
       {state.kind === "absent" && (
         <ol style={{ color: "#666", lineHeight: 1.7 }}>
-          <li>Open <code>chrome://version</code> — need Chrome 146+.</li>
+          <li>Open <code>chrome://version</code>, need Chrome 146+.</li>
           <li>Enable <code>chrome://flags/#enable-webmcp-testing</code> and relaunch.</li>
           <li>If still absent, this Chrome build lacks WebMCP; verify in the ChatGPT desktop app (Sol/Terra account) instead.</li>
         </ol>
@@ -89,11 +89,11 @@ export default function ProbePage() {
 function renderState(state: ProbeState): string {
   switch (state.kind) {
     case "checking":
-      return "⏳ CHECKING — running registration probe…";
+      return "⏳ CHECKING, running registration probe…";
     case "absent":
-      return `❌ API ABSENT — ${state.where}\n\nWebMCP is not exposed in this browser context.`;
+      return `❌ API ABSENT, ${state.where}\n\nWebMCP is not exposed in this browser context.`;
     case "register-error":
-      return `⚠️ REGISTER ERROR — registerTool threw:\n${state.message}`;
+      return `⚠️ REGISTER ERROR, registerTool threw:\n${state.message}`;
     case "registered":
       return `✅ REGISTERED (via ${state.via}.modelContext)\n\ngetTools() → ${
         state.tools.length

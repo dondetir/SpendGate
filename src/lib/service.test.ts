@@ -74,7 +74,7 @@ describe("approve_expense is manager-only, enforced server-side", () => {
   it("refuses to approve an item that is not flagged for approval", () => {
     setRole(s.id, "manager");
     runTriage(s);
-    // exp-01 is a compliant, auto-approved filler item — not awaiting approval
+    // exp-01 is a compliant, auto-approved filler item, not awaiting approval
     expect(() => approveExpense(s, "exp-01")).toThrow(AuthzError);
   });
 
@@ -110,7 +110,7 @@ describe("refusals are machine-actionable", () => {
     expect(v.reason_code).toBe("role_limit_exceeded");
     expect(v.required_role).toBe("manager");
     expect(v.escalation?.action).toBe("escalate_to_manager");
-    // still flagged and awaiting approval — the probe changed nothing
+    // still flagged and awaiting approval, the probe changed nothing
     const item = listBoard(s).items.find((i) => i.id === "exp-travel-big")!;
     expect(item.status).toBe("flagged");
     expect(item.requiresApproval).toBe(true);

@@ -221,7 +221,7 @@ export default function Home() {
   };
 
   // Sign-out revokes manager authority server-side and drops the manager tool
-  // before showing Login — a WebMCP client must not be able to approve while
+  // before showing Login, a WebMCP client must not be able to approve while
   // the app appears logged out. (If applyRole reloads, the default screen is login.)
   const signOut = async () => {
     try { sessionStorage.setItem("sg_screen", "login"); } catch {}

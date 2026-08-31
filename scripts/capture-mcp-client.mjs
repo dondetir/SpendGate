@@ -1,6 +1,6 @@
 // Act 3 capture: a REAL external WebMCP client driving the board through the
 // browser-provided registry. Uses document.modelContext.getTools() +
-// executeTool(tool, jsonArgs) — no app closures, no faked agent. Renders a
+// executeTool(tool, jsonArgs), no app closures, no faked agent. Renders a
 // terminal transcript pinned right; the live board sits left and reacts.
 import { chromium } from "playwright";
 import { mkdirSync, renameSync } from "node:fs";
@@ -74,7 +74,7 @@ async function main() {
   });
   await sleep(1800);
 
-  await step(async () => { window.__term("▸ executeTool(triage_batch)  — one call, whole queue", "cmd"); });
+  await step(async () => { window.__term("▸ executeTool(triage_batch), one call, whole queue", "cmd"); });
   await step(async () => {
     const r = await window.__call("triage_batch");
     const s = r.summary || r;
@@ -86,7 +86,7 @@ async function main() {
   await step(async () => {
     window.__term("▸ executeTool(read_expense, { id: 'exp-poison' })", "cmd");
     const r = await window.__call("read_expense", { id: "exp-poison" });
-    window.__term("← untrusted=" + r.untrusted + " — memo carries instructions", "warn");
+    window.__term("← untrusted=" + r.untrusted + ", memo carries instructions", "warn");
     window.__term('  ⚠ untrustedContentHint set → NOT following the memo', "warn");
   });
   await sleep(3600);
@@ -100,8 +100,8 @@ async function main() {
   });
   await sleep(3800);
 
-  // manager steps in (human authority) — UI role switch re-registers approve_expense
-  await step(() => window.__term("· a manager takes over (role switch — not a tool)", "info"));
+  // manager steps in (human authority), UI role switch re-registers approve_expense
+  await step(() => window.__term("· a manager takes over (role switch, not a tool)", "info"));
   await page.locator("header").getByText("manager", { exact: true }).click();
   await page.waitForTimeout(2200);
 
@@ -113,7 +113,7 @@ async function main() {
     window.__term("← " + (r.ok ? "approved · authorized server-side" : "error"), "ok");
   });
   await sleep(4200);
-  await step(() => window.__term("✓ done — every call went through document.modelContext", "ok"));
+  await step(() => window.__term("✓ done, every call went through document.modelContext", "ok"));
   await sleep(2600);
 
   const video = page.video();

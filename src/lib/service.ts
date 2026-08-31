@@ -5,10 +5,10 @@ import type { Session } from "./store";
 const APPROVED_DECISION: TriageResult["decision"] = { status: "approved", reasons: ["within_policy"], requiresApproval: false };
 
 // Server-side operations. Every mutation authorizes against session.role, which
-// is stored server-side — never trusts a client-supplied role.
+// is stored server-side, never trusts a client-supplied role.
 
 // A machine-actionable refusal. When a tool call is denied, the server does not
-// return an opaque error — it returns a structured `reason_code` plus the next
+// return an opaque error, it returns a structured `reason_code` plus the next
 // action the agent can take (escalate, switch role), so the agent can
 // self-correct without a human decoding a prose error. This is the difference
 // between a tool that fails and a tool that says "no, and here's what to do."
@@ -35,7 +35,7 @@ export class AuthzError extends Error {
   }
 }
 
-// The structured verdict returned by `request_approval` — the analyst-safe
+// The structured verdict returned by `request_approval`, the analyst-safe
 // "can this be cleared, and by whom?" probe. It NEVER mutates; it only reports
 // authority. An analyst gets a refusal with an escalation path; a manager gets
 // an authorization pointing at the actual money tool (`approve_expense`).
@@ -50,7 +50,7 @@ export interface ApprovalVerdict {
 }
 
 // A board item safe to hand to the agent/UI in bulk: NO memo. The bulk path
-// never exposes untrusted free text — raw memo is only revealed by the
+// never exposes untrusted free text, raw memo is only revealed by the
 // deliberate readExpense call, where untrustedContentHint applies.
 export interface BoardItemView {
   id: string;
@@ -119,13 +119,13 @@ export function readExpense(session: Session, id: string): (Expense & { untruste
   const e = session.board.find((x) => x.id === id);
   if (!e) return null;
   // Compute the untrusted signal directly from the memo, independent of whether
-  // triage has run — the safety hint must not depend on prior state.
+  // triage has run, the safety hint must not depend on prior state.
   return { ...e, untrusted: detectUntrustedContent(e.memo) };
 }
 
 // approve_expense: privileged, MANAGER ONLY, enforced server-side. Clears a
 // flagged item. An analyst session cannot reach this regardless of what the
-// agent asks — this is the human-in-the-loop money gate.
+// agent asks, this is the human-in-the-loop money gate.
 export function approveExpense(session: Session, id: string): BoardItemView {
   if (session.role !== "manager") {
     throw new AuthzError("Only a manager can approve a flagged expense.", {
@@ -138,7 +138,7 @@ export function approveExpense(session: Session, id: string): BoardItemView {
   const e = session.board.find((x) => x.id === id);
   if (!e) throw new AuthzError(`Expense ${id} not found`, { reason_code: "not_found", expenseId: id });
   const prior = session.decisions[id];
-  // Only a flagged item that actually needs approval can be approved — not a
+  // Only a flagged item that actually needs approval can be approved, not a
   // pending, already-approved, or rejected one.
   if (!prior || !prior.decision.requiresApproval) {
     throw new AuthzError("Only a flagged expense awaiting approval can be approved.", {
@@ -154,7 +154,7 @@ export function approveExpense(session: Session, id: string): BoardItemView {
 
 // request_approval: the analyst-safe probe. Reports WHO can clear a flagged
 // item without ever mutating anything. This is the tool an analyst agent calls
-// instead of the (unregistered-for-analysts) approve_expense — and the refusal
+// instead of the (unregistered-for-analysts) approve_expense, and the refusal
 // it returns is machine-actionable, so the agent self-corrects by escalating.
 // Manager-side it authorizes and points at the real money tool.
 export function requestApproval(session: Session, id: string): ApprovalVerdict {

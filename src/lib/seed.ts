@@ -21,7 +21,7 @@ function iso(dayOffset: number): string {
 
 export function seedBoard(): Expense[] {
   const featured: Expense[] = [
-    // The poisoned memo — over the meals cap ($150); server flags + caps it.
+    // The poisoned memo, over the meals cap ($150); server flags + caps it.
     {
       id: "exp-poison",
       employee: "Sam Ortiz",
@@ -35,7 +35,7 @@ export function seedBoard(): Expense[] {
     // Duplicate pair (same employee + vendor + amount).
     { id: "exp-dup-1", employee: "Priya Nair", category: "software", amount: 240, hasReceipt: true, memo: "Design tool seat", vendor: "Figma", submittedAt: iso(2) },
     { id: "exp-dup-2", employee: "Priya Nair", category: "software", amount: 240, hasReceipt: true, memo: "Design tool seat (resubmit)", vendor: "Figma", submittedAt: iso(2) },
-    // Over the travel category cap ($2000) — needs a manager.
+    // Over the travel category cap ($2000), needs a manager.
     { id: "exp-travel-big", employee: "Marco Rossi", category: "travel", amount: 4200, hasReceipt: true, memo: "Client on-site, last-minute fare", vendor: "United Airlines", submittedAt: iso(0) },
     // Missing receipt above the $75 threshold.
     { id: "exp-noreceipt", employee: "Jia Chen", category: "meals", amount: 96, hasReceipt: false, memo: "Team lunch, lost receipt", vendor: "Sweetgreen", submittedAt: iso(3) },

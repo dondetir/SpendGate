@@ -1,7 +1,7 @@
 import type { Decision, EvalContext, Expense, ReasonCode } from "./types";
 
 // The decision engine. Consumes ONLY structured fields of `expense`.
-// It never reads `expense.memo` — that is the injection-containment guarantee
+// It never reads `expense.memo`, that is the injection-containment guarantee
 // enforced by engine.test.ts. Do not reference `.memo` in this function.
 export function evaluate(expense: Expense, ctx: EvalContext): Decision {
   const { role, policy, priorExpenses = [] } = ctx;
@@ -41,7 +41,7 @@ export interface TriageResult {
 }
 
 // The whole-queue decision run. This is exactly what the `triage_batch` WebMCP
-// tool executes server-side in ONE call — the agent never decides anything.
+// tool executes server-side in ONE call, the agent never decides anything.
 // Duplicate detection uses the rest of the batch as priors.
 export function triageBatch(expenses: Expense[], ctx: EvalContext): TriageResult[] {
   return expenses.map((e) => ({

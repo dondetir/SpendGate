@@ -3,13 +3,13 @@ import crypto from "node:crypto";
 import { createSession, getSession, type Session } from "./store";
 
 // Opaque, HMAC-signed session id in an httpOnly cookie. The cookie NEVER carries
-// the role — role lives server-side in the store. A forged/tampered id fails the
+// the role, role lives server-side in the store. A forged/tampered id fails the
 // signature check and gets a fresh analyst session.
 
 const COOKIE = "sg_sid";
 const DEV_SECRET = "dev-secret-change-me";
 // `||` (not `??`) so an empty SESSION_SECRET="" also falls back to DEV_SECRET,
-// which the prod check below then refuses — an empty secret must not sign cookies.
+// which the prod check below then refuses, an empty secret must not sign cookies.
 const SECRET = process.env.SESSION_SECRET || DEV_SECRET;
 const IS_PROD = process.env.NODE_ENV === "production";
 

@@ -3,7 +3,7 @@ import type { TriageResult } from "./policy/engine";
 import { seedBoard } from "./seed";
 
 // Session-keyed, in-process store. State lives for the lifetime of the Node
-// process — correct on a persistent server (Render / `next start`), NOT on
+// process, correct on a persistent server (Render / `next start`), NOT on
 // per-invocation serverless. Each judge session gets its own seeded board so
 // concurrent testers never corrupt each other's demo.
 //

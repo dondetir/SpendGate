@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SpendGate — Agents move the work. Policy makes the call.",
+  title: "SpendGate: Agents move the work. Policy makes the call.",
   description:
     "Policy-based expense approvals with role-aware controls and protected memo review.",
 };

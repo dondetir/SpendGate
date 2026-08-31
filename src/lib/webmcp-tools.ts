@@ -64,7 +64,7 @@ function baseTools(): ModelContextTool[] {
       name: "request_approval",
       title: "Ask whether a flagged expense can be cleared (and by whom)",
       description:
-        "Probe authority for a flagged expense WITHOUT changing anything. Returns a structured verdict: { ok, reason_code, human_reason, required_role?, escalation?, next_action? }. If you are not authorized, reason_code is 'role_limit_exceeded' and 'escalation' tells you the next step (route to a manager) — act on it rather than retrying. If authorized, next_action points at approve_expense. Use this before attempting a money action.",
+        "Probe authority for a flagged expense WITHOUT changing anything. Returns a structured verdict: { ok, reason_code, human_reason, required_role?, escalation?, next_action? }. If you are not authorized, reason_code is 'role_limit_exceeded' and 'escalation' tells you the next step (route to a manager), act on it rather than retrying. If authorized, next_action points at approve_expense. Use this before attempting a money action.",
       inputSchema: {
         type: "object",
         properties: { id: { type: "string", description: "Expense id to check, e.g. exp-travel-big" } },
@@ -83,7 +83,7 @@ function managerTools(): ModelContextTool[] {
       name: "approve_expense",
       title: "Approve a flagged expense (manager only)",
       description:
-        "Approve a single flagged or over-limit expense. This is a consequential, money-moving action restricted to managers and authorized server-side. If denied, it returns a structured refusal { ok:false, reason_code, human_reason, required_role?, escalation? } — act on 'escalation' to self-correct rather than retrying the same call.",
+        "Approve a single flagged or over-limit expense. This is a consequential, money-moving action restricted to managers and authorized server-side. If denied, it returns a structured refusal { ok:false, reason_code, human_reason, required_role?, escalation? }, act on 'escalation' to self-correct rather than retrying the same call.",
       inputSchema: {
         type: "object",
         properties: { id: { type: "string", description: "Expense id to approve" } },
@@ -139,7 +139,7 @@ export async function setManagerTools(enabled: boolean): Promise<RegisterResult>
     } else if (typeof window !== "undefined") {
       // No unregisterTool in this browser (e.g. Chrome 152 exposes only
       // registerTool/getTools/executeTool). Reload so the page re-registers the
-      // analyst-only surface cleanly — otherwise approve_expense would linger and
+      // analyst-only surface cleanly, otherwise approve_expense would linger and
       // the chip would misreport the tool count for a downgraded role.
       window.location.reload();
       return { supported: true, registered: present.filter((n) => n !== "approve_expense") };

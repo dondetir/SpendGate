@@ -12,7 +12,7 @@ export interface Expense {
   category: Category;
   amount: number; // USD, positive
   hasReceipt: boolean;
-  memo: string; // FREE TEXT — untrusted, display-only
+  memo: string; // FREE TEXT, untrusted, display-only
   vendor: string;
   submittedAt: string; // ISO date
 }
