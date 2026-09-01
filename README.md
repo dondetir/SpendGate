@@ -2,11 +2,19 @@
 
 > **Agents move the work. Policy makes the call.**
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) &nbsp;![Built on WebMCP](https://img.shields.io/badge/built%20on-WebMCP-6E56CF) &nbsp;![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs&logoColor=white) &nbsp;![React 19](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white) &nbsp;![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white) &nbsp;![32 tests passing](https://img.shields.io/badge/tests-32%20passing-brightgreen)
+
 **An agent-operable expense-approval console built on WebMCP.** A ChatGPT browser agent triages a real approval queue against company policy in one server-side pass, and the board updates live. It makes visible the governance that actually blocks enterprises from shipping agents: role-scoped tools, server-authorized money actions, and prompt-injection containment.
 
 Built for the [WebMCP Challenge](https://webmcp.devpost.com/).
 
-**[Live demo](https://spendgate-zc4d.onrender.com)** (free tier, first load can take ~50s to wake) · **[Demo video](https://youtu.be/h_jmjKuMDl0)** (under 2 min)
+### ▶ [Live demo](https://spendgate-zc4d.onrender.com) &nbsp;·&nbsp; [Watch the 2-min demo video](https://youtu.be/h_jmjKuMDl0)
+
+<a href="https://youtu.be/h_jmjKuMDl0">
+  <img src="https://img.youtube.com/vi/h_jmjKuMDl0/maxresdefault.jpg" alt="Watch the SpendGate demo video" width="640">
+</a>
+
+_The live demo runs on Render's free tier; the first request can take ~50s to wake._
 
 ---
 
