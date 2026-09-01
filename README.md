@@ -2,9 +2,11 @@
 
 > **Agents move the work. Policy makes the call.**
 
-**An agent-operable expense-approval console built on WebMCP.** A ChatGPT browser agent triages a real approval queue against company policy in one server-side pass, and the board updates live, with the governance that actually blocks enterprises from shipping agents made visible: role-scoped tools, server-authorized money actions, and prompt-injection containment.
+**An agent-operable expense-approval console built on WebMCP.** A ChatGPT browser agent triages a real approval queue against company policy in one server-side pass, and the board updates live. It makes visible the governance that actually blocks enterprises from shipping agents: role-scoped tools, server-authorized money actions, and prompt-injection containment.
 
 Built for the [WebMCP Challenge](https://webmcp.devpost.com/).
+
+**[Live demo](https://spendgate-zc4d.onrender.com)** (free tier, first load can take ~50s to wake) · **[Demo video](https://youtu.be/h_jmjKuMDl0)** (under 2 min)
 
 ---
 
